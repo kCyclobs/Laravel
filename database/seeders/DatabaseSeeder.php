@@ -5,6 +5,14 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Master\Country;
 use App\Models\Master\Genre;
+
+use App\Models\Movie;
+use App\Models\Actor;
+use App\Models\Director;
+
+use App\Models\MovieActorWeb;
+use App\Models\MovieDirectorWeb;
+
 use Illuminate\Support\Facades\Hash;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -49,5 +57,13 @@ class DatabaseSeeder extends Seeder
                 'name' => $Genre
             ]);
         }
+
+
+        Actor::factory(10)->create();
+        Director::factory(10)->create();
+        Movie::factory(10)->create();
+       
+        MovieActorWeb::factory(10)->create();
+        MovieDirectorWeb::factory(10)->create();
     }
 }

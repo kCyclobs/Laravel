@@ -1,16 +1,58 @@
 @extends('admin.template')
 
 @section('content')
-    
+<head>
+    <!-- Include SweetAlert2 CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include jQuery Validation Plugin -->
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script>
+    <!-- Include jQuery Loading Overlay Plugin if needed -->
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
+</head>
+
+@if ($message = Session::get('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '{{ $message }}',
+                confirmButtonText: 'OK'
+            });
+        });
+    </script>
+@endif
+@if ($message = Session::get('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'error',
+                text: '{{ $message }}',
+                confirmButtonText: 'Retry'
+            });
+        });
+    </script>
+@endif
+<div class="col-12">
+    <div class="row">
+        @if($message = Session::get('error'))
+            <div style="color: red" class="alert alert-success" role="alert">
+                {{ $message }}
+            </div>
+        @endif
+    </div>
+</div>
     <!-- profile -->
     <div class="col-12">
         <div class="profile__content">
             <!-- profile user -->
             <div class="profile__user">
                 <div class="profile__avatar">
-                    <img src="{{ url('img/user.svg') }}" alt=""
-                    id="update_profile_pic">
-                    
+                    <img src="{{ Auth::user()->profile ? url('profile/' . Auth::user()->profile) : url('img/user.svg') }}" alt="" id="update_profile_pic">
+                    {{-- src="{{ url('profile/'. Auth::user()->profile )}}" --}}
                     <input type="file" id="FileUpload1" style="display: none" />
                 </div>
                 <!-- or red -->
@@ -70,7 +112,8 @@
                     <div class="row">
                         <!-- details form -->
                         <div class="col-12 col-lg-6">
-                            <form action="#" class="sign__form sign__form--profile sign__form--first">
+                            <form action="{{ route('save') }}" method="POST"  class="sign__form sign__form--profile sign__form--first">
+                                @csrf
                                 <div class="row">
                                     <div class="col-12">
                                         <h4 class="sign__title">Profile details</h4>
@@ -78,34 +121,47 @@
 
                                     <div class="col-12 col-md-6 col-lg-12 col-xl-6">
                                         <div class="sign__group">
-                                            <label class="sign__label" for="username">Login</label>
-                                            <input id="username" type="text" name="username" class="sign__input" value="{{ Auth::User()->name }}">
+                                            <label class="sign__label" for="name">Login</label>
+                                            <input id="name" type="text" name="name" class="sign__input" value="{{ Auth::User()->name }}">
                                         </div>
                                     </div>
 
                                     <div class="col-12 col-md-6 col-lg-12 col-xl-6">
                                         <div class="sign__group">
                                             <label class="sign__label" for="email">Email</label>
-                                            <input id="email" type="text" name="email" class="sign__input" value="{{ Auth::User()->email }}">
+                                            <input id="email" type="text" name="email" class="sign__input" value="{{ Auth::User()->email }}" readonly>
                                         </div>
                                     </div>
 
                                     
 
                                     
+                                    <div class="col-12 col-md-6 col-lg-12 col-xl-6">
+                                        <div class="sign__group">
+                                            <label class="sign__label" for="subscription">Subscription</label>
+                                            <input id="subscription" type="text" name="subscription" class="sign__input" value="Basic" readonly>
+                                        </div>
+                                    </div>
 
                                     <div class="col-12 col-md-6 col-lg-12 col-xl-6">
+                                        <div class="sign__group">
+                                            <label class="sign__label" for="rights">Rights</label>
+                                            <input id="rights" type="text" name="rights" class="sign__input" value="User" readonly>
+                                        </div>
+                                    </div>
+
+                                    {{-- <div class="col-12 col-md-6 col-lg-12 col-xl-6">
                                         <div class="sign__group">
                                             <label class="sign__label" for="subscription">Subscription</label>
                                             <select class="js-example-basic-single" id="subscription">
                                                 <option value="Basic">Basic</option>
-                                                <option value="Premium">Premium</option>
+                                               <option value="Premium">Premium</option>
                                                 
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="col-12 col-md-6 col-lg-12 col-xl-6">
+                                    {{-- <div class="col-12 col-md-6 col-lg-12 col-xl-6">
                                         <div class="sign__group">
                                             <label class="sign__label" for="rights">Rights</label>
                                             <select class="js-example-basic-single" id="rights">
@@ -114,10 +170,10 @@
                                                 <option value="Admin">Admin</option>
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-12">
-                                        <button class="sign__btn" type="button">Save</button>
+                                        <button class="sign__btn" type="submit">Save</button>
                                     </div>
                                 </div>
                             </form>
@@ -125,8 +181,9 @@
                         <!-- end details form -->
 
                         <!-- password form -->
-                        <div class="col-12 col-lg-6">
-                            <form action="#" class="sign__form sign__form--profile">
+                        <div class="col-12 col-lg-6" id="changePassword">
+                            <form method="POST" action="{{ route('password.update') }}"  class="sign__form sign__form--profile" >
+                                @csrf
                                 <div class="row">
                                     <div class="col-12">
                                         <h4 class="sign__title">Change password</h4>
@@ -134,27 +191,36 @@
 
                                     <div class="col-12 col-md-6 col-lg-12 col-xl-6">
                                         <div class="sign__group">
-                                            <label class="sign__label" for="oldpass">Old password</label>
-                                            <input id="oldpass" type="password" name="oldpass" class="sign__input">
+                                            <label class="sign__label" for="current_password">Old password</label>
+                                            <input  id="current_password" type="password" name="current_password" class="sign__input" required autofocus autocomplete="current-password">
                                         </div>
+                                        @error('current_password')
+                                            <span style="color: red">{{ $message }}</span>
+                                        @enderror
                                     </div>
 
                                     <div class="col-12 col-md-6 col-lg-12 col-xl-6">
                                         <div class="sign__group">
-                                            <label class="sign__label" for="newpass">New password</label>
-                                            <input id="newpass" type="password" name="newpass" class="sign__input">
+                                            <label class="sign__label" for="new_password">New password</label>
+                                            <input id="new_password" type="password" name="new_password" class="sign__input" required autocomplete="new-password">
                                         </div>
+                                        @error('new_password')
+                                            <span style="color: red">{{ $message }}</span>
+                                        @enderror
                                     </div>
 
                                     <div class="col-12 col-md-6 col-lg-12 col-xl-6">
                                         <div class="sign__group">
-                                            <label class="sign__label" for="confirmpass">Confirm new password</label>
-                                            <input id="confirmpass" type="password" name="confirmpass" class="sign__input">
+                                            <label class="sign__label" for="new_password_confirmation">Confirm new password</label>
+                                            <input id="new_password_confirmation" type="password" name="new_password_confirmation" class="sign__input" required autocomplete="new-password">
                                         </div>
+                                        @error('new_password')
+                                        <span style="color: red">{{ $message }}</span>
+                                    @enderror
                                     </div>
 
                                     <div class="col-12">
-                                        <button class="sign__btn" type="button">Change</button>
+                                        <button class="sign__btn" type="submit">Change</button>
                                     </div>
                                 </div>
                             </form>
@@ -168,41 +234,87 @@
     <!-- end content tabs -->
 
 
-<script>
 
+<script>
     let fileupload = $("#FileUpload1");
     let image = $("#update_profile_pic");
 
-    image.click(function () {
+    image.click(function() {
         fileupload.click();
     });
-
-    fileupload.change(function (e) {
-        
-        file = this.files[0];
-        console.log(file);
+    fileupload.change(function(e) {
+        let file = this.files[0];
         if (file) {
             let reader = new FileReader();
-            reader.onload = function (event) {
-                
+            reader.onload = function(event) {
                 image.attr("src", event.target.result);
             };
+            //console.log(file);
             reader.readAsDataURL(file);
         }
-
-
-        
-       
+        let form = new FormData();
+        form.append('image', file);
+        $.ajax({
+            url:"/profile/upload",
+            method:"POST",
+            headers: {
+            'X-CSRF-Token' : '{{csrf_token()}}',
+            },
+            dataType:'JSON',
+            data: form,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success:function(response) {
+                console.log("Success: " + response.message);
+            },
+            error: function(response) {
+                console.log("error: " + response.message);
+            }
+        })
     });
-
-
-    
-    
-
-    // $('#update_profile_pic').on('click', function() {
-	// 	//readURL(this);
-    //     alert("done");
-	// });
 </script>
+{{-- <script type="text/javascript" src="{{asset('js/profile.js')}}"></script> --}}
+{{-- <script>
+    $(document).ready(function() {
+    $('#change_password_form').validate({
+        ignore: '.ignore',
+        errorClass: 'invalid',
+        validClass: 'success',
+        rules: {
+            old_password: {
+                required: true,
+                minlength: 8,
+                maxlength: 100
+            },
+            new_password: {
+                required: true,
+                minlength: 8,
+                maxlength: 100
+            },
+            confirm_password: {
+                required: true,
+                equalTo: '#new_password'
+            }
+        },
+        messages: {
+            old_password: {
+                required: "Enter your old password"
+            },
+            new_password: {
+                required: "Enter your new password"
+            },
+            confirm_password: {
+                required: "Need to confirm your new password",
+                equalTo: "Passwords do not match"
+            }
+        },
+        submitHandler: function(form) {
+            $.LoadingOverlay("show");
+            form.submit();
+        }
+    });
+}); --}}
 
+</script>
 @endsection

@@ -26,7 +26,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_admin',
         
     ];
+    public function movies()
+    {
+        return $this->hasMany(Movie::class);
+    }
 
+
+   
     /**
      * The attributes that should be hidden for serialization.
      *

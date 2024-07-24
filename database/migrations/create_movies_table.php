@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("title");
             $table->string("desc",4000);
-            $table->string("realease");
+            $table->string("release_date");
             $table->string("runtime");
             $table->enum('quality',['hd','fullHD','2k','4k']);
             $table->enum('type',['movie','tvshow']);
@@ -24,9 +24,13 @@ return new class extends Migration
             $table->string("back_photo")->defual("nothumb_back.png");
             $table->string("source_link");
             $table->unsignedBigInteger("user_id");
+            // $table->unsignedBigInteger("actor_id");
+            // $table->unsignedBigInteger("director_id");
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');
+            //$table->foreign('actor_id')->references('id')->on('actors');
+            //$table->foreign('director_id')->references('id')->on('directors');
         });
     }
 
